@@ -1,0 +1,53 @@
+/dts-v1/;
+/plugin/;
+
+/ {
+	compatible = "allwinner,sun8i-h3";
+
+	fragment@0 {
+		target = <&spi1>;
+		__overlay__ {
+			status = "okay";
+
+			spidev@0{
+				status = "disabled";
+			};
+
+			spidev@1{
+				status = "disabled";
+			};
+		};
+	};
+
+	fragment@1 {
+		target = <&pio>;
+		__overlay__ {
+			opiz_display_pins: opiz_display_pins {
+                pins = "PA2", "PA10";
+                function = "gpio_out";
+			};
+		};
+	};
+
+	fragment@2 {
+		target = <&spi1>;
+		__overlay__ {
+			/* needed to avoid dtc warning */
+			#address-cells = <1>;
+			#size-cells = <0>;
+
+			opizdisplay: opiz-display@0{
+				compatible = "philips,pcd8544";
+				reg = <0>;
+				pinctrl-names = "default";
+				pinctrl-0 = <&opiz_display_pins>;
+
+				spi-max-frequency = <400000>;
+				fps = <30>;
+				buswidth = <8>;
+				reset-gpios = <&pio 0 10 1>;
+				dc-gpios = <&pio 0 2 0>;
+			};
+		};
+	};
+};
